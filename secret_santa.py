@@ -52,7 +52,7 @@ class Person:
         self.invalid_matches = invalid_matches
     
     def __str__(self):
-        return "%s <%s>" % (self.name, self.email)
+        return "{} <{}>".format(self.name, self.email)
 
 class Pair:
     def __init__(self, giver, reciever):
@@ -60,7 +60,7 @@ class Pair:
         self.reciever = reciever
     
     def __str__(self):
-        return "%s ---> %s" % (self.giver.name, self.reciever.name)
+        return "{} ---> {}".format(self.giver.name, self.reciever.name)
 
 def parse_yaml(yaml_path=CONFIG_PATH):
     return yaml.load(open(yaml_path))    
@@ -114,7 +114,7 @@ def main(argv=None):
         for key in REQRD:
             if key not in config.keys():
                 raise Exception(
-                    'Required parameter %s not in yaml config file!' % (key,))
+                    'Required parameter {} not in yaml config file!'.format(key))
 
         participants = config['PARTICIPANTS']
         dont_pair = config['DONT-PAIR']
@@ -142,14 +142,14 @@ def main(argv=None):
             print """
 Test pairings:
                 
-%s
+{}
                 
 To send out emails with new pairings,
 call with the --send argument:
 
     $ python secret_santa.py --send
             
-            """ % ("\n".join([str(p) for p in pairs]))
+            """.format("\n".join([str(p) for p in pairs]))
         
         if send:
             server = smtplib.SMTP(config['SMTP_SERVER'], config['SMTP_PORT'])
@@ -159,7 +159,7 @@ call with the --send argument:
             zone = pytz.timezone(config['TIMEZONE'])
             now = zone.localize(datetime.datetime.now())
             date = now.strftime('%a, %d %b %Y %T %Z') # Sun, 21 Dec 2008 06:25:23 +0000
-            message_id = '<%s@%s>' % (str(time.time())+str(random.random()), socket.gethostname())
+            message_id = '<{}@{}>'.format(str(time.time())+str(random.random()), socket.gethostname())
             frm = config['FROM']
             to = pair.giver.email
             subject = config['SUBJECT'].format(santa=pair.giver.name, santee=pair.reciever.name)
@@ -174,7 +174,7 @@ call with the --send argument:
             )
             if send:
                 result = server.sendmail(frm, [to], body)
-                print "Emailed %s <%s>" % (pair.giver.name, to)
+                print "Emailed {} <{}>".format(pair.giver.name, to)
 
         if send:
             server.quit()
